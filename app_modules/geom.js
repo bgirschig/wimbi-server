@@ -14,8 +14,6 @@ function posFromSensors(sensors){
     }
   }
 
-  console.log("computedPositions: ",computedPositions);
-
   var tx=0, ty=0, s = computedPositions.length;
   for(var i=0;i<s;i++){
     tx+=computedPositions[i].x;

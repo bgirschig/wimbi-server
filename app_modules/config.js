@@ -16,6 +16,6 @@ config.piezoTreshold = 30;
 
 config.useCalibration = null;
 config.useCalibration = "calibration_3";
-calibrationDelay = 1000;
+config.calibrationDelay = 1000;
 
 module.exports = config;

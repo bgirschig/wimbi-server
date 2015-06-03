@@ -13,9 +13,19 @@ var fs = require('fs');
 var piezoTrack;
 var record;
 var sensors;
+var allowTap;
 
 function init(){
-    console.log('\033[2J//////////////////////////////////////////////////////////////////\n\n\n');
+    console.log(
+      '\033[2J',
+      '//////////////////////////////////////////////////////////////////\n',
+      'tapwoodServer 0.0.1\n\n',
+      'features:\n',
+      '  - communication with tapwood ipad\n',
+      '  - communication with arduino ultrasonics-code\n',
+      '  - calibration procedure\n',
+      '  - save calibration\n',
+      '//////////////////////////////////////////////////////////////////\n\n');
 
     // server config
     socketServer.init({
@@ -35,6 +45,7 @@ function init(){
     piezoTrack = [];
     record = false;
     sensors = [];
+    allowTap = true;
 
     // create sensors (x,y,max,id) /!\ couter-clockwise
     sensors.push(new Sensor(82, 18.5, 147, sensors.length));
@@ -47,15 +58,26 @@ function onDeviceConnect(){
   socketServer.broadcast("deviceStatus,connected");
   console.log("connected to arduino\n");
 
+  console.log(
+  "\n\n========================================================\n",
+  "---- Calibration --------------------------\n");
+
   if(config.useCalibration==null){
+    // process.exit();
     // start calibration.
     process.stdin.on('data', onInput);
-    console.log("\n\n///////////////////////////////////////////////////// Calibration: ");
+    console.log(
+      "for each sensor, you will be asked to place an object at 10 or 100cm from the sensor, then hit enter. for example:",
+      "\tcalibrate [0]10cm (Hit enter when ready)\nmeans: place an object at 10cm from sensor 0",
+      "-------------------------------------------\n\n"
+    );
+
     calibrateStep();
   }
   else{
-    console.log("loading calibration from file:\n");
     var parsed = JSON.parse(fs.readFileSync("saved/"+config.useCalibration+".json", "utf8"));
+    
+    console.log("loaded calibration from file:");
     for(key in parsed){
       sensors[key].a = parsed[key].a;
       sensors[key].b = parsed[key].b;
@@ -63,6 +85,7 @@ function onDeviceConnect(){
       console.log("["+key+"] a:" + parsed[key].a + " b:" + parsed[key].b);
     }
     calDone = true;
+    console.log("========================================================\n");
   }
 }
 
@@ -76,9 +99,10 @@ function onData(data, err){
       piezoTrack.push(piezoVal);
     }
 
-    // if piezo is > treshold, record
-    else if(piezoVal>config.piezoTreshold && calDone){
+    // if piezo is > treshold and allowTap is true, measure
+    else if(piezoVal>config.piezoTreshold && calDone && allowTap){
       measure(onTap, 15, isStillTap);
+      allowTap = false; setTimeout(function(){allowTap=true;}, 200);
     }
   }
 }
@@ -105,13 +129,20 @@ function isStillTap(){
   return (max==undefined || max>config.piezoTreshold);
 }
 
-// values are already averaged and converted to cm by 'measure' (use 'lastComputed')
 function onTap(){
+  // log measured distances (after average and conversion to cm)
   for(key in sensors) console.log("["+key+"] "+sensors[key].lastComputed);
-  console.log(geom.posFromSensors(sensors));
+  console.log(/* spacer */);
 
-  piezoTrack = []; // reset piezo track
-  // console.log(/* spacer */);
+  // send computed position;
+  pos = geom.posFromSensors(sensors);
+  if(pos!=null && pos.error==null){
+    console.log("====> tap result: "+pos.x+", "+pos.y);
+    socketServer.broadcast(pos.x+","+pos.y);
+  }
+
+  // reset piezo track
+  piezoTrack = [];
 }
 
 
@@ -128,16 +159,13 @@ onInput = function(data){
 }
 calibrateStep = function(){
   calStep++;
-  print("calibrate ["+Math.floor(calStep/2)+"]"+calPoints[calStep%calPoints.length]+"cm: ");
+  print("calibrate ["+Math.floor(calStep/2)+"]"+calPoints[calStep%calPoints.length]+"cm (Hit enter when ready)");
 }
 onCalibration = function(){
-  var id = Math.floor(calStep/2);
+  var currentCal = Math.floor(calStep/2);
 
-  sensors[id].calibrate(calPoints);
-  console.log("["+id+"]: "+sensors[id].lastComputed+"\n");
+  sensors[currentCal].calibrate(calPoints);
   
-  if(sensors[id].calibrated) console.log("calibration for ["+id+"]:\n   a:"+sensors[id].a+"\n   b:"+sensors[id].b+"\n\n");
-
   if(calStep<sensors.length*2-1) calibrateStep();
   else{
     calStep++; // get out of calibration mode
@@ -149,7 +177,8 @@ onCalibration = function(){
     saved = saved.substring(0,saved.length-2) + "\n]\n";
 
     fs.writeFile("saved/calibration_"+Date.now()+".json", saved, "utf8");
-    console.log("calibration has been saved:\n"+saved);
+    console.log("\ncalibration has been saved:\n"+saved);
+    console.log("========================================================\n\n");
   }
 }
 ////////////////////////////////////////////////////////////////////////////
