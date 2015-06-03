@@ -1,0 +1,15 @@
+{
+  "name": "tapwood_server",
+  "version": "1.0.0",
+  "description": "## features tcp server and client for communication between arduino and openframeworks. - fast and reliable communication between arduino and openframeworks - debugging interface \t- prints raw messages \t- handles special messages (connection, status...) \t- click to send test string - robust. can handle: \t- late server launch / server crash & relaunch \t- arduino disconnect & reconnect",
+  "main": "index.js",
+  "dependencies": {
+    "arduinoConnect": "file:../../../../usr/local/lib/node_modules/_arduinoConnect"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Bastien Girschig <bastien.girschig@gmail.com> (http://www.bastiengirschig.fr)",
+  "license": "MIT"
+}
