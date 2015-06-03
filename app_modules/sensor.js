@@ -1,9 +1,12 @@
-function Sensor(x, y, max){
+function Sensor(x, y, max, id){
 	this.a = 1;
 	this.b = 0;
 	this.calibrated = false;
 	this.max = max;
 	this.values = [];
+	this.id = id;
+	this.x = x;
+	this.y = y;
 	
 	this.calVals = [];
 	this.lastComputed = 0;
@@ -18,7 +21,8 @@ Sensor.prototype.record = function(val){
 Sensor.prototype.combineVals = function(){
 	var t = 0;
 	for(key in this.values) t += this.values[key];
-	this.lastComputed = t/this.values.length;
+	if(this.values.length>0) this.lastComputed = t/this.values.length;
+	else this.lastComputed = null;
 
 	this.values = [];
 	return this.lastComputed;

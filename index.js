@@ -36,11 +36,11 @@ function init(){
     record = false;
     sensors = [];
 
-    // create sensors (x,y,max)
-    sensors.push(new Sensor(84, 7.6, 147));
-    sensors.push(new Sensor(31, -38.5, 145));
-    sensors.push(new Sensor(125, -38.5, 135));
-    sensors.push(new Sensor(-3, -38.5, 136));
+    // create sensors (x,y,max,id) /!\ couter-clockwise
+    sensors.push(new Sensor(82, 18.5, 147, sensors.length));
+    sensors.push(new Sensor(79, 1, 145, sensors.length));
+    sensors.push(new Sensor(72.5, -17, 135, sensors.length));
+    sensors.push(new Sensor(71.9, -35.5, 136, sensors.length));
 }
 
 function onDeviceConnect(){
@@ -108,8 +108,10 @@ function isStillTap(){
 // values are already averaged and converted to cm by 'measure' (use 'lastComputed')
 function onTap(){
   for(key in sensors) console.log("["+key+"] "+sensors[key].lastComputed);
+  console.log(geom.posFromSensors(sensors));
+
   piezoTrack = []; // reset piezo track
-  console.log(/* spacer */);
+  // console.log(/* spacer */);
 }
 
 
@@ -150,6 +152,7 @@ onCalibration = function(){
     console.log("calibration has been saved:\n"+saved);
   }
 }
+////////////////////////////////////////////////////////////////////////////
 
 init(); // start everything
 
