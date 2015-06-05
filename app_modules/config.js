@@ -15,7 +15,7 @@ config.arduinoConfig = {
 config.piezoTreshold = 30;
 
 config.useCalibration = null;
-config.useCalibration = "calibration_3";
+// config.useCalibration = "calibration_1433410257321";
 config.calibrationDelay = 1000;
 
 module.exports = config;
