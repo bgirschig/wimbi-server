@@ -182,7 +182,7 @@ onCalibration = function(){
   }
 }
 
-onClientData = function (msg){ console.log(msg); }
+onClientData = function (msg){ print(msg); }
 ////////////////////////////////////////////////////////////////////////////
 
 init(); // start everything
