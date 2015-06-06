@@ -181,6 +181,8 @@ onCalibration = function(){
     console.log("========================================================\n\n");
   }
 }
+
+onClientData = function (msg){ console.log(msg); }
 ////////////////////////////////////////////////////////////////////////////
 
 init(); // start everything

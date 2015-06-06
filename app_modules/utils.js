@@ -19,7 +19,6 @@ global.onClientConnect = function (){
 	if(arduino.connected) socketServer.broadcast("deviceStatus,connected");
 	else socketServer.broadcast("deviceStatus,disconnected");
 }
-global.onClientData = function (msg){ console.log(msg); }
 
 global.arrayMax = function(array){var max = array[0]; for(val in array) if(array[val] > max) max = array[val];return max;}
 global.truncate = function(val, precision){precision = Math.pow(10,precision); return Math.floor(val*precision)/precision;}
