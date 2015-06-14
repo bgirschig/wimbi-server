@@ -1,3 +1,5 @@
+This is an old version of the tapwood server, made for the sonar technology, which was abandonned.
+
 # tapwood server
 
 ###calibration
