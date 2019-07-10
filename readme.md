@@ -1,4 +1,4 @@
-This is an old version of the tapwood server, made for the sonar technology, which was abandonned.
+This is an old version of the tapwood server, made for the sonar technology, which was abandoned.
 
 # tapwood server
 
